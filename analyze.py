@@ -87,11 +87,16 @@ def main(log_file):
 		num = lines[i][1]
 		 
 		if i == 0:
-			print("{}\t{}\t# 0:00:00.000000".format(ts, num))
+			print("{}\t{}\t# 0:00:00.000000 <start>".format(ts, num))
 		else:
 			tsp = lines[i-1][0]
+			nump = lines[i-1][1]
 			duration = tdiff.timeDiff(tsp, ts)
-			print("{}\t{}\t# {}".format(ts, num, duration))
+			if (num - nump) == 1:
+				period = '</good>'
+			else:
+				period = '</bad>'
+			print("{}\t{}\t# {} {}".format(ts, num, duration, period))
 
 
 if __name__ == '__main__':
