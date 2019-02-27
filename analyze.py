@@ -48,8 +48,8 @@ def main(log_file):
 					# We haven't saved a timestamp yet
 					lastRetryTimestamp = ts
 					lastRetryLine = line[:-1]
-					lastImportantTS = ts
-					lastImportantLine = line[:-1]
+					#lastImportantTS = ts
+					#lastImportantLine = line[:-1]
 				else:
 					# Calculate the time diff
 					duration = tdiff.timeDiff(lastRetryTimestamp, ts)
@@ -69,7 +69,15 @@ def main(log_file):
 					lastRetryLine = line[:-1]
 				
 				#!print(tdiff.getTimestamp(line))
-	
+		else:
+			# Consider the first line with a timestamp to be the start of the scan
+			if lastImportantTS == None:
+				ts = tdiff.getTimestamp(line)
+				if ts != None:
+					lastImportantTS = ts
+					lastImportantLine = line[:-1]
+					print("{}\t\t# 0:00:00.000000".format(lastImportantLine))
+				 
 	fh.close()
 
 
