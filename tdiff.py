@@ -1,9 +1,23 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Compute the time between two camonitor timestamps
 #
 
 import datetime as dt
+import re
+
+
+def getTimestamp(line):
+	regexStr = "20[0-9][0-9]-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9]\.[0-9][0-9][0-9][0-9][0-9][0-9]"
+	regex = re.compile(regexStr)
+	match = regex.search(line)
+	if match == None:
+		retval = None
+	else:
+		retval = match.string[match.start():match.end()]
+		#!print(retval, match.start(), match.end())
+	return retval
+
 
 def timeDiff(dt1, dt2):
 	#!print dt1
@@ -19,7 +33,6 @@ def timeDiff(dt1, dt2):
 	tdiff = dto2 - dto1
 	
 	return tdiff
-
 
 if __name__ == '__main__':
 	import argparse as ap
@@ -45,4 +58,4 @@ if __name__ == '__main__':
 	
 	tdiff = timeDiff(dt1, dt2)
 	
-	print tdiff
+	print(tdiff)
