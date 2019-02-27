@@ -83,11 +83,15 @@ def main(log_file):
 	fh.close()
 	
 	for i in range(0, len(lines)):
+		ts = lines[i][0]
+		num = lines[i][1]
+		 
 		if i == 0:
-			print("{}\t{}\t# 0:00:00.000000".format(lines[i][0], lines[i][1]))
+			print("{}\t{}\t# 0:00:00.000000".format(ts, num))
 		else:
-			duration = tdiff.timeDiff(lines[i-1][0], lines[i][0])
-			print("{}\t{}\t# {}".format(lines[i][0], lines[i][1], duration))
+			tsp = lines[i-1][0]
+			duration = tdiff.timeDiff(tsp, ts)
+			print("{}\t{}\t# {}".format(ts, num, duration))
 
 
 if __name__ == '__main__':
