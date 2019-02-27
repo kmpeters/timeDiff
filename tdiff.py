@@ -3,38 +3,46 @@
 # Compute the time between two camonitor timestamps
 #
 
-# 2019-02-20 22:27:31.493586
-# 2019-02-21 00:51:46.747478
-
-import sys
-import argparse as ap
 import datetime as dt
 
-parser = ap.ArgumentParser("tdiff.py")
+def timeDiff(dt1, dt2):
+	#!print dt1
+	#!print dt2
+	
+	dt_format = "%Y-%m-%d %H:%M:%S.%f"
+	dto1 = dt.datetime.strptime(dt1, dt_format)
+	dto2 = dt.datetime.strptime(dt2, dt_format)
+	
+	#!print dto1
+	#!print dto2
+	
+	tdiff = dto2 - dto1
+	
+	return tdiff
 
-parser.add_argument("d1", action="store", default=None,  help='First date')
-parser.add_argument("t1", action="store", default=None,  help='First time')
-parser.add_argument("d2", action="store", default=None,  help='Second date')
-parser.add_argument("t2", action="store", default=None,  help='Second time')
 
-opt = parser.parse_args(sys.argv[1:])
-
-#print(opts)
-#print(vars(opt))
-
-dt1 = "{} {}".format(opt.d1, opt.t1)
-dt2 = "{} {}".format(opt.d2, opt.t2)
-
-#!print dt1
-#!print dt2
-
-dt_format = "%Y-%m-%d %H:%M:%S.%f"
-dto1 = dt.datetime.strptime(dt1, dt_format)
-dto2 = dt.datetime.strptime(dt2, dt_format)
-
-#!print dto1
-#!print dto2
-
-tdiff = dto2 - dto1
-
-print tdiff
+if __name__ == '__main__':
+	import argparse as ap
+	import sys
+	
+	parser = ap.ArgumentParser("tdiff.py")
+	
+	# 2019-02-20 22:27:31.493586
+	# 2019-02-21 00:51:46.747478
+	
+	parser.add_argument("d1", action="store", default=None,  help='First date')
+	parser.add_argument("t1", action="store", default=None,  help='First time')
+	parser.add_argument("d2", action="store", default=None,  help='Second date')
+	parser.add_argument("t2", action="store", default=None,  help='Second time')
+	
+	opt = parser.parse_args(sys.argv[1:])
+	
+	#print(opts)
+	#print(vars(opt))
+	
+	dt1 = "{} {}".format(opt.d1, opt.t1)
+	dt2 = "{} {}".format(opt.d2, opt.t2)
+	
+	tdiff = timeDiff(dt1, dt2)
+	
+	print tdiff
