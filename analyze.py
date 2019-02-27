@@ -132,7 +132,7 @@ def computeDurations(lines):
 
 def printDurations(durations):
 	for d in durations:
-		print("{} - {} : {} {} period ({} failures)".format(d['start'], d['end'], d['duration'], d['period'], d['failures']))
+		print("{} - {} : {} {} period ({} failures)".format(d['start'], d['end'], d['duration'], d['period'], d['failures']-1))
 
 
 if __name__ == '__main__':
