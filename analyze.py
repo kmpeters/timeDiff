@@ -82,8 +82,12 @@ def main(log_file):
 	
 	fh.close()
 	
-	for line in lines:
-		print(line)
+	for i in range(0, len(lines)):
+		if i == 0:
+			print("{}\t{}\t# 0:00:00.000000".format(lines[i][0], lines[i][1]))
+		else:
+			duration = tdiff.timeDiff(lines[i-1][0], lines[i][0])
+			print("{}\t{}\t# {}".format(lines[i][0], lines[i][1], duration))
 
 
 if __name__ == '__main__':
