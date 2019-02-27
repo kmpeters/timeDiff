@@ -13,6 +13,7 @@ import re
 import tdiff
 import datetime as dt
 
+THRESHOLD=15.0
 
 def main(log_file):
 	# Try to open the log file
@@ -24,69 +25,65 @@ def main(log_file):
 
 	# 
 	relevantLine = re.compile('scan3|totalRetries')
-	retryLine = re.compile("totalRetries.* ([0-9]+)")
-	lastRetryTimestamp = None
-	lastRetryLine = None
-	lastRetryNum = 0
+	retryLine = re.compile("(.*totalRetries[^ ]*) *(.*-.*-.* .*:.*:.*\..*) ([0-9]+)")
+
+	lines = []
+
 	lastImportantTS = None
-	lastImportantLine = None
-	lastImportantNum = 0
-	lastDuration = None
+	#!lastImportantLine = None
+	lastRetryTS = None
+	lastRetryNum = 0
 
 	for line in fh:
-		if relevantLine.search(line) != None:
-			#!print(line[:-1])
-			
-			match = retryLine.search(line)
-			if match != None:
-				# Line is a retry line
-				groups = match.groups()
-				num = int(groups[0])
-				
-				# Get the line's timestamp
-				ts = tdiff.getTimestamp(line)
-				if ts == None:
-					# line doesn't have a timestamp (should only happen on connect/disconnect)
-					continue
-				
-				if lastRetryTimestamp == None:
-					# We haven't saved a timestamp yet
-					lastRetryTimestamp = ts
-					lastRetryLine = line[:-1]
-					lastRetryNum = num
-					#lastImportantTS = ts
-					#lastImportantLine = line[:-1]
-				else:
-					# Calculate the time diff
-					duration = tdiff.timeDiff(lastRetryTimestamp, ts)
-					
-					# Check to see if the duration is longer than a threshhold
-					threshhold = dt.timedelta(minutes=15.0)
-					
-					if duration > threshhold:
-						lastDuration = tdiff.timeDiff(lastImportantTS, lastRetryTimestamp)
-						print("{}\t\t# {}".format(lastRetryLine, lastDuration))
-						
-						print("{}\t\t# {}".format(line[:-1], duration))
-						lastImportantTS = ts
-						lastImportantLine = line[:-1]
-						lastImportantNum = num
-					#
-					lastRetryTimestamp = ts
-					lastRetryLine = line[:-1]
-					lastRetryNum = num
-				
-				#!print(tdiff.getTimestamp(line))
-		else:
+		if relevantLine.search(line) == None:
 			# Consider the first line with a timestamp to be the start of the scan
 			if lastImportantTS == None:
 				ts = tdiff.getTimestamp(line)
 				if ts != None:
 					lastImportantTS = ts
-					lastImportantLine = line[:-1]
-					print("{}\t\t# 0:00:00.000000".format(lastImportantLine))
-				 
+					#!lastImportantLine = line[:-1]
+					#!print("{}\t\t# 0:00:00.000000".format(lastImportantLine))
+					lines.append((ts, 0))
+		else:
+			match = retryLine.search(line)
+			if match != None:
+				ts = match.group(2)
+				num = int(match.group(3))
+				
+				#print(match.groups())
+				#print(match.group(1))
+				#print(match.group(2))
+				#print(match.group(3))
+				
+				if lastRetryTS == None:
+					# We haven't saved a timestamp yet
+					lastRetryTS = ts
+					lastRetryNum = num
+					# This first line may be important
+					lines.append((ts, num))
+				else:
+					# Calculate the time diff
+					duration = tdiff.timeDiff(lastRetryTS, ts)
+					
+					# Check to see if the duration is longer than a threshhold
+					threshhold = dt.timedelta(minutes=THRESHOLD)
+					
+					if duration > threshhold:
+						# The previous item was important, add it if it wasn't added in the previous iteration
+						if (lastRetryTS, lastRetryNum) not in lines:
+							lines.append((lastRetryTS, lastRetryNum))
+						
+						# The current item is also important
+						lines.append((ts, num))
+						lastImportantTS = ts
+					
+					lastRetryTS = ts
+					lastRetryNum = num
+	
 	fh.close()
+	
+	for line in lines:
+		print(line)
 
 
 if __name__ == '__main__':
