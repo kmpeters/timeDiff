@@ -15,7 +15,7 @@ import datetime as dt
 
 THRESHOLD=15.0
 
-def main(log_file):
+def getLines(log_file):
 	# Try to open the log file
 	try:
 		fh = open(log_file, 'r')
@@ -82,6 +82,10 @@ def main(log_file):
 	
 	fh.close()
 	
+	return lines[:]
+	
+def printLines(lines):
+	#
 	for i in range(0, len(lines)):
 		ts = lines[i][0]
 		num = lines[i][1]
@@ -104,4 +108,5 @@ if __name__ == '__main__':
 	if len(sys.argv) != 2:
 		print("Usage: analyze.py <log_file>")
 	else:
-		main(sys.argv[1])
+		lines = getLines(sys.argv[1])
+		printLines(lines)
