@@ -55,7 +55,7 @@ def main(log_file):
 					duration = tdiff.timeDiff(lastRetryTimestamp, ts)
 					
 					# Check to see if the duration is longer than a threshhold
-					threshhold = dt.timedelta(minutes=5.0)
+					threshhold = dt.timedelta(minutes=15.0)
 					
 					if duration > threshhold:
 						lastDuration = tdiff.timeDiff(lastImportantTS, lastRetryTimestamp)
