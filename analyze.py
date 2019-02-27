@@ -13,7 +13,9 @@ import re
 import tdiff
 import datetime as dt
 
+
 THRESHOLD=15.0
+
 
 def getLines(log_file):
 	# Try to open the log file
@@ -83,7 +85,8 @@ def getLines(log_file):
 	fh.close()
 	
 	return lines[:]
-	
+
+
 def printLines(lines):
 	#
 	for i in range(0, len(lines)):
@@ -103,6 +106,35 @@ def printLines(lines):
 			print("{}\t{}\t# {} {}".format(ts, num, duration, period))
 
 
+def computeDurations(lines):
+	#
+	durations = []
+	
+	for i in range(0, len(lines)):
+		ts = lines[i][0]
+		num = lines[i][1]
+		 
+		if i == 0:
+			pass
+		else:
+			tsp = lines[i-1][0]
+			nump = lines[i-1][1]
+			duration = tdiff.timeDiff(tsp, ts)
+			failures = num - nump
+			if failures == 1:
+				period = 'good'
+			else:
+				period = 'bad'
+			durations.append({'end':ts, 'start':tsp, 'duration':duration, 'period':period, 'failures':failures})
+	
+	return durations[:]
+
+
+def printDurations(durations):
+	for d in durations:
+		print("{} - {} : {} {} period ({} failures)".format(d['start'], d['end'], d['duration'], d['period'], d['failures']))
+
+
 if __name__ == '__main__':
 	#
 	if len(sys.argv) != 2:
@@ -110,3 +142,6 @@ if __name__ == '__main__':
 	else:
 		lines = getLines(sys.argv[1])
 		printLines(lines)
+		print("")
+		durations = computeDurations(lines)
+		printDurations(durations)
