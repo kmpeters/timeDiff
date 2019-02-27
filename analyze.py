@@ -24,19 +24,24 @@ def main(log_file):
 
 	# 
 	relevantLine = re.compile('scan3|totalRetries')
-	retryLine = re.compile('totalRetries')
+	retryLine = re.compile("totalRetries.* ([0-9]+)")
 	lastRetryTimestamp = None
 	lastRetryLine = None
+	lastRetryNum = 0
 	lastImportantTS = None
 	lastImportantLine = None
+	lastImportantNum = 0
 	lastDuration = None
 
 	for line in fh:
 		if relevantLine.search(line) != None:
 			#!print(line[:-1])
 			
-			if retryLine.search(line) != None:
+			match = retryLine.search(line)
+			if match != None:
 				# Line is a retry line
+				groups = match.groups()
+				num = int(groups[0])
 				
 				# Get the line's timestamp
 				ts = tdiff.getTimestamp(line)
@@ -48,6 +53,7 @@ def main(log_file):
 					# We haven't saved a timestamp yet
 					lastRetryTimestamp = ts
 					lastRetryLine = line[:-1]
+					lastRetryNum = num
 					#lastImportantTS = ts
 					#lastImportantLine = line[:-1]
 				else:
@@ -64,9 +70,11 @@ def main(log_file):
 						print("{}\t\t# {}".format(line[:-1], duration))
 						lastImportantTS = ts
 						lastImportantLine = line[:-1]
+						lastImportantNum = num
 					#
 					lastRetryTimestamp = ts
 					lastRetryLine = line[:-1]
+					lastRetryNum = num
 				
 				#!print(tdiff.getTimestamp(line))
 		else:
