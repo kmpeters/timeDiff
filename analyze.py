@@ -157,13 +157,12 @@ def computePredictions(durations, numPeriods=10):
 	durationList = [d['duration'] for d in durations]
 	# List of durations in seconds
 	secondsList = [d.total_seconds() for d in durationList]
-	#print(durationList)
-	#print(secondsList)
+	#!print(durationList)
+	#!print(secondsList)
 	
-	# The last period is most likely still in progress when the program runs.
-	# Subtract the second-to-last period from each item in the list to see
+	# Subtract the last period from each item in the list to see
 	# how many periods there are before the pattern repeats.
-	tempList = [t - secondsList[-2] for t in secondsList]
+	tempList = [t - secondsList[-1] for t in secondsList]
 	#!print(tempList, len(tempList))
 	# Find the zeros in the list
 	i = 0
@@ -172,15 +171,15 @@ def computePredictions(durations, numPeriods=10):
 		if abs(tempList[i]) <= TOLERANCE:
 			zeroes.append(i)
 		i += 1
-	# The last element in the zeroes list is the index of the 2nd-to-last duration
 	#!print(zeroes)
 	# Use the last full iteration of the pattern to make the predictions
 	patternStart = zeroes[-2]+1
-	patternEnd = zeroes[-1]+1
-	patternDurations = durations[patternStart:patternEnd]
+	# The last element in the zeroes list is the index of the last duration
+	patternEnd = zeroes[-1]
+	patternDurations = durations[patternStart:]
 	#!print(patternDurations, patternEnd)
 	# The predictions start at the end of the pattern
-	predictionStart = durations[patternEnd]['start']
+	predictionStart = durations[patternEnd]['end']
 	#!print("Sanity check", durations[patternEnd])
 	#!print(predictionStart)
 	i = 0
