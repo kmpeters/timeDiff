@@ -14,8 +14,10 @@ import tdiff
 import datetime as dt
 
 
+# Threshold in minutes for failures to belong to a new period
 THRESHOLD=15.0
-
+# Tolerance in seconds for periods to be considered the same
+TOLERANCE=90.0
 
 def getLines(log_file):
 	# Try to open the log file
@@ -135,6 +137,48 @@ def printDurations(durations):
 		print("{} - {} : {} {} period ({} failures)".format(d['start'], d['end'], d['duration'], d['period'], d['failures']-1))
 
 
+def computePredictions(durations, numPeriods=10):
+	#
+	predictions = []
+	# List of timedelta objects
+	durationList = [d['duration'] for d in durations]
+	# List of durations in seconds
+	secondsList = [d.total_seconds() for d in durationList]
+	#print(durationList)
+	#print(secondsList)
+	
+	# The last period is most likely still in progress when the program runs.
+	# Subtract the second-to-last period from each item in the list to see
+	# how many periods there are before the pattern repeats.
+	tempList = [t - secondsList[-2] for t in secondsList]
+	#!print(tempList, len(tempList))
+	# Find the zeros in the list
+	i = 0
+	zeroes = []
+	while i < len(tempList):
+		if abs(tempList[i]) <= TOLERANCE:
+			zeroes.append(i)
+		i += 1
+	# The last element in the zeroes list is the index of the 2nd-to-last duration
+	print(zeroes)
+	# Use the last full iteration of the pattern to make the predictions
+	patternStart = zeroes[-2] 
+	patternEnd = zeroes[-1]
+	patternDurations = durationList[patternStart:patternEnd]
+	#!print(patternDurations, patternEnd)
+	# The predictions start at the end of the pattern
+	predictionStart = durations[patternEnd]['end']
+	#!print(predictionStart)
+	i = 0
+	predictions = []
+	ps = tdiff.timeStrToObj(predictionStart)
+	while i < numPeriods:
+		iDur = patternDurations[i % len(patternDurations)]
+		pe = ps + iDur
+		predictions.append({'end':pe, 'start':ps, 'duration':iDur}) #, 'period':period, 'failures':failures})
+		ps = pe
+		i += 1
+
 if __name__ == '__main__':
 	#
 	if len(sys.argv) != 2:
@@ -145,3 +189,4 @@ if __name__ == '__main__':
 		print("")
 		durations = computeDurations(lines)
 		printDurations(durations)
+		computePredictions(durations)
