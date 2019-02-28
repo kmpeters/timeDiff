@@ -170,27 +170,28 @@ def computePredictions(durations, numPeriods=10):
 			zeroes.append(i)
 		i += 1
 	#!print(zeroes)
-	# Use the last full iteration of the pattern to make the predictions
-	patternStart = zeroes[-2]+1
-	# The last element in the zeroes list is the index of the last duration
-	patternEnd = zeroes[-1]
-	patternDurations = durations[patternStart:]
-	#!print(patternDurations, patternEnd)
-	# The predictions start at the end of the pattern
-	predictionStart = durations[patternEnd]['end']
-	#!print("Sanity check", durations[patternEnd])
-	#!print(predictionStart)
-	i = 0
-	predictions = []
-	ps = tdiff.timeStrToObj(predictionStart)
-	while i < numPeriods:
-		iDur = patternDurations[i % len(patternDurations)]['duration']
-		iPer = patternDurations[i % len(patternDurations)]['period']
-		iFail = patternDurations[i % len(patternDurations)]['failures']
-		pe = ps + iDur
-		predictions.append({'end':tdiff.timeObjToStr(pe), 'start':tdiff.timeObjToStr(ps), 'duration':iDur, 'period':iPer, 'failures':iFail})
-		ps = pe
-		i += 1
+	
+	if len(zeroes) > 1:
+		# Use the last full iteration of the pattern to make the predictions
+		patternStart = zeroes[-2]+1
+		# The last element in the zeroes list is the index of the last duration
+		patternEnd = zeroes[-1]
+		patternDurations = durations[patternStart:]
+		#!print(patternDurations, patternEnd)
+		# The predictions start at the end of the pattern
+		predictionStart = durations[patternEnd]['end']
+		#!print("Sanity check", durations[patternEnd])
+		#!print(predictionStart)
+		i = 0
+		ps = tdiff.timeStrToObj(predictionStart)
+		while i < numPeriods:
+			iDur = patternDurations[i % len(patternDurations)]['duration']
+			iPer = patternDurations[i % len(patternDurations)]['period']
+			iFail = patternDurations[i % len(patternDurations)]['failures']
+			pe = ps + iDur
+			predictions.append({'end':tdiff.timeObjToStr(pe), 'start':tdiff.timeObjToStr(ps), 'duration':iDur, 'period':iPer, 'failures':iFail})
+			ps = pe
+			i += 1
 	
 	return predictions
 
