@@ -91,6 +91,7 @@ def getLines(log_file):
 
 def printLines(lines):
 	#
+	print ("Significant Events:")
 	for i in range(0, len(lines)):
 		ts = lines[i][0]
 		num = lines[i][1]
@@ -106,6 +107,7 @@ def printLines(lines):
 			else:
 				period = '</bad>'
 			print("{}\t{}\t# {} {}".format(ts, num, duration, period))
+	print()
 
 
 def computeDurations(lines):
@@ -134,7 +136,16 @@ def computeDurations(lines):
 
 def printDurations(durations):
 	for d in durations:
-		print("{} - {} : {} {} period ({} failures)".format(d['start'], d['end'], d['duration'], d['period'], d['failures']-1))
+		# Show microseconds
+		#!print("{} - {} : {} {} period ({} failures)".format(d['start'], d['end'], d['duration'], d['period'], d['failures']-1))
+		# Don't show microseconds
+		print("{} - {} : {} {} period ({} failures)".format(d['start'][:-7], d['end'][:-7], d['duration'], d['period'], d['failures']-1))
+
+
+def printHistory(durations):
+	print("Scan History:")
+	printDurations(durations)
+	print()
 
 
 def computePredictions(durations, numPeriods=10):
@@ -160,24 +171,36 @@ def computePredictions(durations, numPeriods=10):
 			zeroes.append(i)
 		i += 1
 	# The last element in the zeroes list is the index of the 2nd-to-last duration
-	print(zeroes)
+	#!print(zeroes)
 	# Use the last full iteration of the pattern to make the predictions
-	patternStart = zeroes[-2] 
-	patternEnd = zeroes[-1]
-	patternDurations = durationList[patternStart:patternEnd]
+	patternStart = zeroes[-2]+1
+	patternEnd = zeroes[-1]+1
+	patternDurations = durations[patternStart:patternEnd]
 	#!print(patternDurations, patternEnd)
 	# The predictions start at the end of the pattern
-	predictionStart = durations[patternEnd]['end']
+	predictionStart = durations[patternEnd]['start']
+	#!print("Sanity check", durations[patternEnd])
 	#!print(predictionStart)
 	i = 0
 	predictions = []
 	ps = tdiff.timeStrToObj(predictionStart)
 	while i < numPeriods:
-		iDur = patternDurations[i % len(patternDurations)]
+		iDur = patternDurations[i % len(patternDurations)]['duration']
+		iPer = patternDurations[i % len(patternDurations)]['period']
+		iFail = patternDurations[i % len(patternDurations)]['failures']
 		pe = ps + iDur
-		predictions.append({'end':pe, 'start':ps, 'duration':iDur}) #, 'period':period, 'failures':failures})
+		predictions.append({'end':tdiff.timeObjToStr(pe), 'start':tdiff.timeObjToStr(ps), 'duration':iDur, 'period':iPer, 'failures':iFail})
 		ps = pe
 		i += 1
+	
+	return predictions
+
+
+def printPredictions(predictions):
+	print("Predictions:")
+	printDurations(predictions)
+	print()
+
 
 if __name__ == '__main__':
 	#
@@ -186,7 +209,7 @@ if __name__ == '__main__':
 	else:
 		lines = getLines(sys.argv[1])
 		printLines(lines)
-		print("")
 		durations = computeDurations(lines)
-		printDurations(durations)
-		computePredictions(durations)
+		printHistory(durations)
+		predictions = computePredictions(durations)
+		printPredictions(predictions)

@@ -25,6 +25,12 @@ def timeStrToObj(dt1):
 	return dto1
 
 
+def timeObjToStr(dto1):
+	dt_format = "%Y-%m-%d %H:%M:%S.%f"
+	dt1 = dt.datetime.strftime(dto1, dt_format)
+	return dt1
+
+
 def timeDiff(dt1, dt2):
 	#!print dt1
 	#!print dt2
