@@ -204,12 +204,17 @@ def printPredictions(predictions):
 
 if __name__ == '__main__':
 	#
-	if len(sys.argv) != 2:
-		print("Usage: analyze.py <log_file>")
+	numArgs = len(sys.argv)
+	
+	if numArgs not in (2, 3):
+		print("Usage: analyze.py <log_file> [prection_periods]")
 	else:
 		lines = getLines(sys.argv[1])
 		printLines(lines)
 		durations = computeDurations(lines)
 		printHistory(durations)
-		predictions = computePredictions(durations)
+		if numArgs == 3:
+			predictions = computePredictions(durations, int(sys.argv[2]))
+		else:
+			predictions = computePredictions(durations)
 		printPredictions(predictions)
