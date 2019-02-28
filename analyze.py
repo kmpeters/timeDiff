@@ -7,6 +7,8 @@
 # kmpSD2:saveData_totalRetries   2019-02-26 09:38:28.746452 1  
 # kmpSD2:scan3.CPT               2019-02-26 09:32:51.995168 1  
 
+# TODO: Fix prediction start: currently duplicates the last period
+# 		which is already completed
 
 import sys
 import re
@@ -207,7 +209,7 @@ if __name__ == '__main__':
 	numArgs = len(sys.argv)
 	
 	if numArgs not in (2, 3):
-		print("Usage: analyze.py <log_file> [prection_periods]")
+		print("Usage: analyze.py <log_file> [prediction_periods]")
 	else:
 		lines = getLines(sys.argv[1])
 		printLines(lines)
