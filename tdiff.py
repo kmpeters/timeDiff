@@ -32,15 +32,15 @@ def timeObjToStr(dto1):
 
 
 def timeDiff(dt1, dt2):
-	#!print dt1
-	#!print dt2
+	#!print(dt1)
+	#!print(dt2)
 	
 	dt_format = "%Y-%m-%d %H:%M:%S.%f"
 	dto1 = dt.datetime.strptime(dt1, dt_format)
 	dto2 = dt.datetime.strptime(dt2, dt_format)
 	
-	#!print dto1
-	#!print dto2
+	#!print(dto1)
+	#!print(dto2)
 	
 	tdiff = dto2 - dto1
 	
